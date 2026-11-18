@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EnrichFlow — GTM Data Workbench</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">◈</div>
+          <div>
+            <div class="brand-name">EnrichFlow</div>
+            <div class="brand-sub">GTM data workbench</div>
+          </div>
+        </div>
+
+        <nav class="side-section">
+          <div class="side-label">Tables</div>
+          <button class="side-item active" data-template="leads">
+            <span class="side-ico">▦</span> Outbound leads
+            <span class="side-count" id="rowCountSide">8</span>
+          </button>
+          <button class="side-item" data-template="companies">
+            <span class="side-ico">▦</span> Target accounts
+          </button>
+          <button class="side-item" data-template="inbound">
+            <span class="side-ico">▦</span> Inbound scoring
+          </button>
+        </nav>
+
+        <nav class="side-section">
+          <div class="side-label">Integrations</div>
+          <div class="integ" data-on="1">
+            <span class="dot on"></span> Prospeo
+            <span class="integ-tag">email</span>
+          </div>
+          <div class="integ" data-on="1">
+            <span class="dot on"></span> Hunter
+            <span class="integ-tag">email</span>
+          </div>
+          <div class="integ" data-on="1">
+            <span class="dot on"></span> Dropcontact
+            <span class="integ-tag">email</span>
+          </div>
+          <div class="integ" data-on="1">
+            <span class="dot on"></span> Clearbit
+            <span class="integ-tag">firmo</span>
+          </div>
+          <div class="integ" data-on="1">
+            <span class="dot on"></span> BuiltWith
+            <span class="integ-tag">tech</span>
+          </div>
+          <div class="integ" data-on="1">
+            <span class="dot on"></span> Claude
+            <span class="integ-tag">ai</span>
+          </div>
+          <div class="integ" data-on="0">
+            <span class="dot"></span> Salesforce
+            <span class="integ-tag">crm</span>
+          </div>
+          <div class="integ" data-on="0">
+            <span class="dot"></span> HubSpot <span class="integ-tag">crm</span>
+          </div>
+        </nav>
+
+        <div class="side-section side-foot">
+          <div class="side-label">This month</div>
+          <div class="usage-row">
+            <span>Credits used</span><b id="usedCredits">0</b>
+          </div>
+          <div class="usage-bar"><div id="usageFill"></div></div>
+          <div class="usage-hint" id="creditsHint">1,000 credits remaining</div>
+        </div>
+      </aside>
+
+      <!-- ============ MAIN ============ -->
+      <main class="main">
+        <header class="topbar">
+          <div class="table-title">
+            <span class="crumb">Workspace /</span>
+            <span id="tableName" contenteditable="true" spellcheck="false"
+              >Outbound leads</span
+            >
+          </div>
+          <div class="topbar-actions">
+            <span class="credits-pill" title="Enrichment credits"
+              ><span class="ember">●</span>
+              <b id="creditsLeft">1,000</b> credits</span
+            >
+            <button class="btn ghost" id="importBtn">Import CSV</button>
+            <input type="file" id="csvFile" accept=".csv" hidden />
+            <button class="btn ghost" id="exportBtn">Export CSV</button>
+            <button class="btn primary" id="runAllBtn">
+              ▶ Run all columns
+            </button>
+          </div>
+        </header>
+
+        <div class="toolbar">
+          <input
+            class="search"
+            id="search"
+            type="search"
+            placeholder="Filter rows…"
+          />
+          <button class="btn small ghost" id="addRowBtn">+ Row</button>
+          <button class="btn small ghost" id="addColBtn">+ Column</button>
+          <div class="toolbar-spacer"></div>
+          <span class="hint" id="statusHint"
+            >Click a column header to configure it · click ▶ on a column to run
+            it</span
+          >
+        </div>
+
+        <div class="grid-wrap" id="gridWrap">
+          <table class="grid" id="grid"></table>
+        </div>
+
+        <footer class="statusbar">
+          <span id="statRows">8 rows</span>
+          <span class="sep">·</span>
+          <span id="statCols">6 columns</span>
+          <span class="sep">·</span>
+          <span id="statRun">No runs yet</span>
+        </footer>
+      </main>
+
+      <!-- ============ RIGHT PANEL ============ -->
+      <aside class="panel" id="panel">
+        <div class="panel-head">
+          <div class="panel-title" id="panelTitle">Column settings</div>
+          <button class="icon-btn" id="panelClose">✕</button>
+        </div>
+        <div class="panel-body" id="panelBody"></div>
+      </aside>
+    </div>
+
+    <!-- ============ ADD COLUMN MODAL ============ -->
+    <div class="modal-veil" id="modalVeil" hidden>
+      <div class="modal">
+        <div class="modal-head">
+          <div class="modal-title">Add a column</div>
+          <button class="icon-btn" id="modalClose">✕</button>
+        </div>
+        <div class="type-cards" id="typeCards">
+          <button class="type-card" data-type="text">
+            <b>Text</b><span>Plain editable field</span>
+          </button>
+          <button class="type-card" data-type="enrich-email">
+            <b>Work email</b
+            ><span>Waterfall: Prospeo → Hunter → Dropcontact</span>
+          </button>
+          <button class="type-card" data-type="enrich-company">
+            <b>Company enrichment</b
+            ><span>Industry, size, HQ, funding via Clearbit</span>
+          </button>
+          <button class="type-card" data-type="enrich-linkedin">
+            <b>LinkedIn profile</b><span>Find profile URL + headline</span>
+          </button>
+          <button class="type-card" data-type="enrich-tech">
+            <b>Tech stack</b><span>Detected tools via BuiltWith</span>
+          </button>
+          <button class="type-card" data-type="ai">
+            <b>AI column</b><span>Prompt Claude with row data</span>
+          </button>
+          <button class="type-card" data-type="formula">
+            <b>Formula</b><span>Compute from other columns</span>
+          </button>
+          <button class="type-card" data-type="score">
+            <b>Lead score</b><span>0–100 from data completeness + fit</span>
+          </button>
+        </div>
+        <div class="modal-config" id="modalConfig"></div>
+        <div class="modal-foot">
+          <button class="btn ghost" id="modalCancel">Cancel</button>
+          <button class="btn primary" id="modalAdd" disabled>Add column</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
